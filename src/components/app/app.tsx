@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import {
   ConstructorPage,
   Feed,
@@ -23,13 +25,31 @@ import { Preloader } from '@ui';
 
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 
+import store, { useSelector, useDispatch } from '../../services/store';
+
+import {
+  getIngredientsSelector,
+  getIngredients
+} from '../../services/slices/ingredientsSlice';
+
 const App = () => {
   /** TODO: взять переменные из стора */
-  const isIngredientsLoading = false;
-  const ingredients = [];
-  const error = null;
+  const { data, loading, error } = useSelector(getIngredientsSelector);
+  const isIngredientsLoading = loading;
+  const ingredients = data;
   const navigate = useNavigate();
   const { number } = useParams();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getIngredients());
+  }, [dispatch]);
+
+  const handleModalClose = () => {
+    navigate(-1);
+  };
+
+  // console.log(store.getState());
 
   return (
     <div className={styles.app}>
@@ -61,7 +81,7 @@ const App = () => {
           <Route
             path='/feed/:number'
             element={
-              <Modal title={`#${number}`} onClose={() => navigate(-1)}>
+              <Modal title={`#${number}`} onClose={handleModalClose}>
                 <OrderInfo />
               </Modal>
             }
@@ -69,7 +89,7 @@ const App = () => {
           <Route
             path='/ingredients/:id'
             element={
-              <Modal title='Детали ингредиента' onClose={() => navigate(-1)}>
+              <Modal title='Детали ингредиента' onClose={handleModalClose}>
                 <IngredientDetails />
               </Modal>
             }
@@ -78,7 +98,7 @@ const App = () => {
             path='/profile/orders/:number'
             element={
               <ProtectedRoute>
-                <Modal title={`#${number}`} onClose={() => navigate(-1)}>
+                <Modal title={`#${number}`} onClose={handleModalClose}>
                   <OrderInfo />
                 </Modal>
               </ProtectedRoute>

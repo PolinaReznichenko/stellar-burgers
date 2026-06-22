@@ -109,7 +109,7 @@ type TOrdersResponse = TServerResponse<{
 
 /**
  * Запрос на получение всех ингредиентов.
- * Возвращает массив ингредиентов (TIngredient[]).
+ * Возвращает массив ингредиентов (TIngredient[]) или промис с данными об ошибке в случае неудачи.
  */
 export const getIngredientsApi = () =>
   fetch(`${URL}/ingredients`)
