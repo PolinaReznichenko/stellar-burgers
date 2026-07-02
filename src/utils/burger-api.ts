@@ -6,7 +6,7 @@ const URL = process.env.BURGER_API_URL;
 
 /**
  * Универсальная функция проверки HTTP-ответа.
- * Если ответ успешный (ok), парсит JSON и возвращает его с типом T.
+ * Если ответ успешный, парсит JSON и возвращает его с типом T.
  * Иначе парсит JSON с ошибкой и отклоняет промис с этой ошибкой
  */
 const checkResponse = <T>(res: Response): Promise<T> =>
@@ -161,7 +161,7 @@ type TOwner = {
 /**
  * Тип данных для создаваемого заказа (ответ от сервера после создания).
  */
-type TNewOrder = {
+export type TNewOrder = {
   _id: string;
   status: string;
   name: string;
@@ -210,7 +210,7 @@ type TOrderResponse = TServerResponse<{
 
 /**
  * Получение заказа по номеру (не требует авторизации).
- * Возвращает объект с массивом заказов (обычно один заказ).
+ * Возвращает объект с массивом заказов (один заказ).
  */
 export const getOrderByNumberApi = (number: number) =>
   fetch(`${URL}/orders/${number}`, {
