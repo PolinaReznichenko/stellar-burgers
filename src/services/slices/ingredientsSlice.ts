@@ -34,7 +34,8 @@ export const ingredientsSlice = createSlice({
       })
       .addCase(getIngredients.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || null;
+        state.error =
+          action.error.message || 'Ошибка загрузки ингредиентов бургера';
       })
       .addCase(getIngredients.fulfilled, (state, action) => {
         state.loading = false;

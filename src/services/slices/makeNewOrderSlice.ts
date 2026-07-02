@@ -42,7 +42,7 @@ export const makeNewOrderSlice = createSlice({
       })
       .addCase(postOrderBurger.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || null;
+        state.error = action.error.message || 'Ошибка при оформлении заказа';
       })
       .addCase(postOrderBurger.fulfilled, (state, action) => {
         state.loading = false;

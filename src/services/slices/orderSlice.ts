@@ -43,7 +43,7 @@ export const orderSlice = createSlice({
       })
       .addCase(getOrderByNumber.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || null;
+        state.error = action.error.message || 'Ошибка загрузки данных заказа';
       })
       .addCase(getOrderByNumber.fulfilled, (state, action) => {
         state.loading = false;

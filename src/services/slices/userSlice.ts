@@ -5,8 +5,6 @@ import {
   getUserApi,
   TRegisterData,
   registerUserApi,
-  forgotPasswordApi,
-  resetPasswordApi,
   updateUserApi,
   logoutApi
 } from '../../utils/burger-api';
@@ -33,19 +31,6 @@ export const registerUser = createAsyncThunk(
     localStorage.setItem('refreshToken', userData.refreshToken);
     return userData.user;
   }
-);
-
-//запрос на восстановление пароля (отправка email)
-export const forgotPassword = createAsyncThunk(
-  'user/forgotPassword',
-  async (email: string) => await forgotPasswordApi({ email })
-);
-
-// сброс пароля с использованием кода подтверждения token
-export const resetPassword = createAsyncThunk(
-  'user/resetPassword',
-  async ({ password, token }: { password: string; token: string }) =>
-    await resetPasswordApi({ password, token })
 );
 
 //запрос на обновление данных пользователя
@@ -128,30 +113,6 @@ export const userSlice = createSlice({
         state.isAuthChecked = true;
         state.isAuthenticated = true;
       })
-      //Восстановление пароля(проверка емэйл)
-      .addCase(forgotPassword.pending, (state) => {
-        state.userRequest = true;
-        state.error = null;
-      })
-      .addCase(forgotPassword.rejected, (state, action) => {
-        state.userRequest = false;
-        state.error = action.error.message || 'Ошибка проверки емэйл';
-      })
-      .addCase(forgotPassword.fulfilled, (state) => {
-        state.userRequest = false;
-      })
-      //Восстановление пароля(сброс пароля)
-      .addCase(resetPassword.pending, (state) => {
-        state.userRequest = true;
-        state.error = null;
-      })
-      .addCase(resetPassword.rejected, (state, action) => {
-        state.userRequest = false;
-        state.error = action.error.message || 'Ошибка сохранения нового пароля';
-      })
-      .addCase(resetPassword.fulfilled, (state) => {
-        state.userRequest = false;
-      })
       //Обновление данных пользователя
       .addCase(updateUser.pending, (state) => {
         state.userRequest = true;
@@ -178,7 +139,7 @@ export const userSlice = createSlice({
         state.userRequest = false;
         state.user = null;
       })
-      //проверка и запрос данных пользователя
+      //Проверка и запрос данных пользователя
       .addCase(checkUserAuth.pending, (state) => {
         state.userRequest = true;
         state.error = null;
@@ -202,30 +163,18 @@ export const checkUserAuth = createAsyncThunk(
   'user/checkUser',
   async (_, { dispatch }) => {
     const accessToken = getCookie('accessToken');
-    if (accessToken) {
-      const userData = await getUserApi();
-      dispatch(setUser(userData.user));
-      dispatch(authChecked());
-    } else {
+    try {
+      if (accessToken) {
+        const userData = await getUserApi();
+        dispatch(setUser(userData.user));
+      }
+    } catch (error) {
+      console.log('Проверка пользователя не удалась:', error);
+    } finally {
       dispatch(authChecked());
     }
   }
 );
-
-// // //проверка наличия токена и при наличии запрос данных пользователя
-// export const checkUserAuth = createAsyncThunk(
-//   'user/checkUser',
-//   async (_, { dispatch }) => {
-//     try {
-//       const userData = await getUserApi();
-//       dispatch(authChecked());
-//       return userData.user;
-//     } catch (error) {
-//       dispatch(authChecked());
-//       console.error(`Ошибка загрузки данных пользователя: ${error}`);
-//     }
-//   }
-// );
 
 export const { authChecked, setUser } = userSlice.actions;
 export const { getUserSelector } = userSlice.selectors;
