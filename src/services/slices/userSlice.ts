@@ -9,7 +9,23 @@ import {
   logoutApi
 } from '../../utils/burger-api';
 import { TUser } from '../../utils/types';
-import { setCookie, getCookie, deleteCookie } from '../../utils/cookie';
+import { setCookie, deleteCookie } from '../../utils/cookie';
+
+//проверка наличия токена и при наличии запрос данных пользователя
+export const checkUserAuth = createAsyncThunk(
+  'user/checkUser',
+  async (_, { dispatch }) => {
+    try {
+      const userData = await getUserApi();
+      return userData.user;
+    } catch (error) {
+      console.log('Проверка пользователя не удалась:', error);
+      throw error;
+    } finally {
+      dispatch(userSlice.actions.authChecked());
+    }
+  }
+);
 
 //запрос для авторизации пользователя(post) и сохранение полученных токенов
 export const loginUser = createAsyncThunk(
@@ -69,10 +85,6 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<TUser>) => {
-      state.user = action.payload;
-      state.isAuthenticated = true;
-    },
     authChecked: (state) => {
       state.isAuthChecked = true;
     }
@@ -82,6 +94,23 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      //Проверка и запрос данных пользователя
+      .addCase(checkUserAuth.pending, (state) => {
+        state.userRequest = true;
+        state.error = null;
+      })
+      .addCase(checkUserAuth.rejected, (state, action) => {
+        state.userRequest = false;
+        state.error =
+          action.error.message || 'Ошибка загрузки данных пользователя';
+        state.isAuthChecked = true;
+      })
+      .addCase(checkUserAuth.fulfilled, (state, action) => {
+        state.userRequest = false;
+        state.user = action.payload;
+        state.isAuthChecked = true;
+        state.isAuthenticated = true;
+      })
       //Логин
       .addCase(loginUser.pending, (state) => {
         state.userRequest = true;
@@ -138,44 +167,10 @@ export const userSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.userRequest = false;
         state.user = null;
-      })
-      //Проверка и запрос данных пользователя
-      .addCase(checkUserAuth.pending, (state) => {
-        state.userRequest = true;
-        state.error = null;
-      })
-      .addCase(checkUserAuth.rejected, (state, action) => {
-        state.userRequest = false;
-        state.error =
-          action.error.message || 'Ошибка загрузки данных пользователя';
-        state.isAuthChecked = true;
-      })
-      .addCase(checkUserAuth.fulfilled, (state, action) => {
-        state.userRequest = false;
-        state.user = action.payload!;
-        state.isAuthChecked = true;
       });
   }
 });
 
-//проверка наличия токена и при наличии запрос данных пользователя
-export const checkUserAuth = createAsyncThunk(
-  'user/checkUser',
-  async (_, { dispatch }) => {
-    const accessToken = getCookie('accessToken');
-    try {
-      if (accessToken) {
-        const userData = await getUserApi();
-        dispatch(setUser(userData.user));
-      }
-    } catch (error) {
-      console.log('Проверка пользователя не удалась:', error);
-    } finally {
-      dispatch(authChecked());
-    }
-  }
-);
-
-export const { authChecked, setUser } = userSlice.actions;
+export const { authChecked } = userSlice.actions;
 export const { getUserSelector } = userSlice.selectors;
 export default userSlice.reducer;
