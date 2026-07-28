@@ -22,7 +22,6 @@ test.describe('Добавление ингредиентов из списка �
     const bunItem = page
       .getByTestId('burger-ingredient')
       .filter({ hasText: 'Флюоресцентная булка R2-D3' });
-    const addButton = bunItem.locator('button:has-text("Добавить")');
 
     const topBunConsctructor = page.getByTestId('top-bun');
     const bottomBunConsctructor = page.getByTestId('bottom-bun');
@@ -32,7 +31,7 @@ test.describe('Добавление ингредиентов из списка �
     await expect(bottomBunConsctructor).not.toBeVisible();
 
     //кликаем на кнопку "Добавить" булки
-    await addButton.click();
+    await bunItem.locator('button:has-text("Добавить")').click();
 
     //Проверяем, что булка добавляется на верх и низ бургера
     await expect(topBunConsctructor).toBeVisible();
@@ -53,10 +52,6 @@ test.describe('Добавление ингредиентов из списка �
     const sauceItem = page
       .getByTestId('burger-ingredient')
       .filter({ hasText: 'Соус традиционный галактический' });
-    const ingredientItemButton = ingredientItem.locator(
-      'button:has-text("Добавить")'
-    );
-    const sauceItemButton = sauceItem.locator('button:has-text("Добавить")');
 
     const ingredientInConsctructor = page
       .getByTestId('burger-constructor-ingredient')
@@ -70,8 +65,8 @@ test.describe('Добавление ингредиентов из списка �
     await expect(sauceInConsctructor).not.toBeVisible();
 
     //кликаем на кнопку "Добавить" ингредиентов
-    await ingredientItemButton.click();
-    await sauceItemButton.click();
+    await ingredientItem.locator('button:has-text("Добавить")').click();
+    await sauceItem.locator('button:has-text("Добавить")').click();
 
     //Проверяем, что начинки добавляются в конструктор
     await expect(ingredientInConsctructor).toBeVisible();
@@ -97,12 +92,11 @@ test.describe('Корректность работы модальных окон
     const ingredientCard = page
       .getByTestId('burger-ingredient')
       .filter({ hasText: 'Филе Люминесцентного тетраодонтимформа' });
-    const cardLink = ingredientCard.getByRole('link');
 
     //Проверяем, что модалки нет в DOM
     await expect(ingredientModal).not.toBeAttached();
     //Кликаем по карточке ингредиента
-    await cardLink.click();
+    await ingredientCard.getByRole('link').click();
     //Проверяем, что модальное окно появилось в DOM и его видно
     await expect(ingredientModal).toBeAttached();
     await expect(ingredientModal).toBeVisible();
@@ -118,11 +112,11 @@ test.describe('Корректность работы модальных окон
       const ingredientCard = page
         .getByTestId('burger-ingredient')
         .filter({ hasText: 'Филе Люминесцентного тетраодонтимформа' });
-      const cardLink = ingredientCard.getByRole('link');
+      
       //Проверяем, что модалки нет в DOM
       await expect(modal).not.toBeAttached();
       //Кликаем по карточке ингредиента
-      await cardLink.click();
+      await ingredientCard.getByRole('link').click();
       //Проверяем, что модальное окно находится в DOM и оно открыто
       await expect(modal).toBeAttached();
       await expect(modal).toBeVisible();
@@ -130,9 +124,9 @@ test.describe('Корректность работы модальных окон
 
     test('Закрывается модальное окно по клику на крестик', async ({ page }) => {
       const modal = page.getByTestId('modal');
-      const closeButton = page.getByTestId('close-modal-button');
+      
       //Клик на крестик
-      await closeButton.click();
+      await page.getByTestId('close-modal-button').click();
       //Проверяем, что модалки не видно и нет в DOM
       await expect(modal).not.toBeVisible();
       await expect(modal).not.toBeAttached();
