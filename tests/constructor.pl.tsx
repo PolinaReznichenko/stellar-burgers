@@ -206,7 +206,7 @@ test.describe('Интеграционные тесты для страницы �
 
       //Проверяем, что появилось модальное окно с данными заказа и номер заказа верный
       const modal = page.getByTestId('modal');
-      const orderNumber = '108504';
+      const orderNumber = '108734';
 
       await expect(modal).toBeAttached({ timeout: 10000 });
       await expect(modal.getByText(/идентификатор заказа/i)).toBeVisible();

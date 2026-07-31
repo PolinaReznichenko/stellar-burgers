@@ -30,6 +30,7 @@ export const BurgerConstructor: FC = () => {
     if (!constructorItems.bun || orderRequest) return;
     if (user) {
       const ingredientsId: string[] = [
+        constructorItems.bun._id,
         ...constructorItems.ingredients.map((ing) => ing._id),
         constructorItems.bun._id
       ];
