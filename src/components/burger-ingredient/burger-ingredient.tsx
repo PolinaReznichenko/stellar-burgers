@@ -20,7 +20,7 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
 
     const getCount = () => {
       if (ingredient.type === 'bun') {
-        return burgerBun && ingredient._id === burgerBun._id ? 1 : 0;
+        return burgerBun && ingredient._id === burgerBun._id ? 2 : 0;
       }
       const ingredientGroup = burgerMain.filter(
         (item) => item._id === ingredient._id
